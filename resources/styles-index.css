@@ -1,0 +1,65 @@
+:root {
+    --color-bg: hsl(5, 5%, 95%);
+    --color-text: hsl(5, 5%, 5%);
+    --color-muted: hsl(5, 5%, 20%);
+    --color-hover: hsl(5, 5%, 90%);
+    --color-border: hsl(5, 5%, 85%);
+    --color-border-hover: hsl(5, 5%, 80%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    place-items: center;
+    height: 100vh;
+    background-image: url(images/grain.png);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: STIX Two Text Regular;
+    justify-content: center;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    color: var(--color-muted);
+}
+
+td {
+    padding: 1rem 0.5rem;
+    width: 6rem;
+    text-align: center;
+    border-bottom: 0.1rem solid var(--color-border);
+    white-space: nowrap;
+}
+
+td a {
+    padding: 0.5rem 1rem;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    background: var(--color-bg);
+    color: var(--color-muted);
+    border: 0.1rem solid var(--color-border);
+    border-radius: 0.2rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+td a:hover {
+    background: var(--color-hover);
+    border-color: var(--color-border-hover);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+@font-face {
+    font-family: STIX Two Text Regular;
+    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
+}

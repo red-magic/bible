@@ -1,0 +1,171 @@
+:root {
+    --color-bg: hsl(5, 5%, 95%);
+    --color-text: hsl(5, 5%, 5%);
+    --color-hover: hsl(5, 5%, 90%);
+    --color-border: hsl(5, 5%, 85%);
+    --border: 0.1rem solid var(--color-border);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: grid;
+    grid-template-columns: 1fr minmax(min-content, 40rem) 1fr;
+    gap: 0 min(10rem, 10vw);
+    background-image: url(images/grain.png);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: STIX Two Text Regular;
+    overflow-y: scroll;
+}
+
+nav {
+    position: sticky;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    height: 100vh;
+}
+
+nav.ot {
+    grid-column: 1;
+    justify-self: end;
+    border-right: var(--border);
+}
+
+nav.nt {
+    grid-column: 3;
+    justify-self: start;
+    border-left: var(--border);
+}
+
+nav ol {
+    padding: 1rem 0;
+    border-top: var(--border);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+nav li {
+    white-space: nowrap;
+}
+
+nav a {
+    padding: 0 1rem;
+    display: block;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+nav a:hover {
+    background: var(--color-hover);
+}
+
+main {
+    grid-column: 2;
+    width: 100%;
+    justify-self: center;
+}
+
+main section {
+    padding-bottom: 1rem;
+    border-bottom: var(--border);
+}
+
+main section:last-child {
+    padding-bottom: 2rem;
+    border-bottom: none;
+}
+
+main p {
+    position: relative;
+    padding: 0 2rem;
+    text-align: justify;
+    hyphens: auto;
+}
+
+main i {
+    font-family: STIX Two Text Italic;
+    font-style: normal;
+}
+
+main sup {
+    position: absolute;
+    padding-right: 0.5rem;
+    box-sizing: border-box;
+    left: 0;
+    width: 2rem;
+    text-align: right;
+}
+
+main img {
+    margin: 0 auto;
+    display: block;
+    width: 4rem;
+}
+
+h1, h2, h3 {
+    padding: 0.5rem 0;
+    text-align: center;
+    font-weight: normal;
+    font-size: 1rem;
+}
+
+h2 {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-image: url(images/grain.png);
+    background-color: var(--color-bg);
+    border-bottom: var(--border);
+}
+
+h3 {
+    padding: 1rem;
+}
+
+@font-face {
+    font-family: STIX Two Text Regular;
+    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
+}
+
+@font-face {
+    font-family: STIX Two Text Italic;
+    src: url(fonts/STIXTwoText-Italic.woff2) format(woff2);
+}
+
+@media only screen and (max-width: 800px) {
+    html {
+        scrollbar-width: thin;
+    }
+
+    body {
+        grid-template-columns: auto;
+        gap: 0;
+    }
+
+    nav {
+        display: none;
+    }
+
+    body.index {
+        overflow-y: auto;
+    }
+
+    body.index nav {
+        display: flex;
+        width: 100%;
+    }
+
+    body.index nav.nt {
+        grid-column: 2;
+        border-left: none;
+    }
+
+    body.index main {
+        display: none;
+    }
+}
