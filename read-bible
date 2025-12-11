@@ -1,61 +1,74 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import re
 import signal
+import argparse
 from typing import TextIO, List, Tuple
 
+# Ignore broken pipes, which is standard practice for command-line tools.
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-def print_usage(script_name: str) -> None:
-    print(f"Usage: {script_name} [width] <filename>")
-    print(f"Options:")
-    print(f"  -n, --no-justify  Disable text justification")
-    print(f"  -h, --help        Show this help")
-    print(f"Examples:")
-    print(f"  {script_name} kjv.txt")
-    print(f"  {script_name} 80 kjv.txt")
-    print(f"  {script_name} -n kjv.txt")
+# Use a constant for indentation to avoid "magic numbers" in the code.
+INDENT = 4
 
 def parse_arguments() -> Tuple[int, str, bool]:
-    width = 60
-    filename = None
-    justify = True
+    """
+    Parses command-line arguments in a robust, standard way.
+    """
+    parser = argparse.ArgumentParser(
+        prog=os.path.basename(sys.argv[0]),
+        description="format the bible txt files",
+        epilog="examples:\n"
+        f"  %(prog)s txt/kjv.txt\n"
+        f"  %(prog)s -w 80 txt/kjv.txt\n"
+        f"  %(prog)s --no-justify txt/syn.txt\n"
+        f"  %(prog)s -w 80 -n txt/syn.txt",
+        formatter_class=argparse.RawTextHelpFormatter # Preserves newlines in examples
+    )
 
+    parser.add_argument(
+        "-w", "--width",
+        type=int,
+        default=60,
+        help="the line width for formatting (default: 60)"
+    )
+    parser.add_argument(
+        "-n", "--no-justify",
+        action="store_true",
+        help="disable text justification"
+    )
+    parser.add_argument("filename", help="the text file to format.")
+
+    # Show help if no arguments are provided, mimicking the original script's behavior.
     if len(sys.argv) == 1:
-        print_usage(sys.argv[0])
+        parser.print_help(sys.stderr)
         sys.exit(0)
 
-    for arg in sys.argv[1:]:
-        if arg.isdigit():
-            width = int(arg)
-        elif arg in ['-n', '--no-justify']:
-            justify = False
-        elif arg in ['-h', '--help', 'help']:
-            print_usage(sys.argv[0])
-            sys.exit(0)
-        else:
-            filename = arg
+    args = parser.parse_args()
 
-    if not filename:
-        print("Error: No filename provided")
-        print_usage(sys.argv[0])
-        sys.exit(1)
+    # The script uses a 'justify' flag, but argparse provides a 'no-justify' flag.
+    # We invert the boolean to match the script's internal logic.
+    justify = not args.no_justify
 
-    return width, filename, justify
+    return args.width, args.filename, justify
 
 def is_surrounded_by_empty(lines: List[str], index: int) -> bool:
+    """Checks if a line is surrounded by empty lines."""
     prev_empty = index == 0 or not lines[index-1].strip()
     next_empty = index == len(lines) - 1 or not lines[index+1].strip()
     return prev_empty and next_empty
 
 def print_centered_line(line: str, width: int) -> None:
+    """Prints a line of text, centered within the given width."""
     clean_line = line.strip()
-    available_width = width - 4
+    available_width = width - INDENT
     padding = max(0, (available_width - len(clean_line)) // 2)
-    print(' ' * 4 + ' ' * padding + clean_line)
+    print(' ' * INDENT + ' ' * padding + clean_line)
 
 def format_verse_prefix(verse_num: str) -> str:
+    """Formats a verse number with leading spaces for alignment."""
     if len(verse_num) == 1:
         return "  " + verse_num
     elif len(verse_num) == 2:
@@ -64,22 +77,25 @@ def format_verse_prefix(verse_num: str) -> str:
         return verse_num
 
 def print_justified_line(words: List[str], available_width: int, prefix: str, is_first: bool) -> None:
-    if not words:
+    """Prints a line of text with full justification."""
+    if not words or len(words) == 1:
+        line_text = ' '.join(words)
+        if is_first:
+            print(f"{prefix} {line_text}")
+        else:
+            print(" " * (len(prefix) + 1) + line_text)
         return
 
-    if len(words) > 1:
-        text_len = sum(len(word) for word in words)
-        spaces_needed = available_width - text_len
-        gaps = len(words) - 1
-        spaces_per_gap = spaces_needed // gaps
-        extra_spaces = spaces_needed % gaps
+    text_len = sum(len(word) for word in words)
+    spaces_needed = available_width - text_len
+    gaps = len(words) - 1
+    spaces_per_gap = spaces_needed // gaps
+    extra_spaces = spaces_needed % gaps
 
-        justified = words[0]
-        for i in range(1, len(words)):
-            spaces = spaces_per_gap + (1 if i <= extra_spaces else 0)
-            justified += ' ' * spaces + words[i]
-    else:
-        justified = words[0]
+    justified = words[0]
+    for i in range(1, len(words)):
+        spaces = spaces_per_gap + (1 if i <= extra_spaces else 0)
+        justified += ' ' * spaces + words[i]
 
     if is_first:
         print(f"{prefix} {justified}")
@@ -87,9 +103,10 @@ def print_justified_line(words: List[str], available_width: int, prefix: str, is
         print(" " * (len(prefix) + 1) + justified)
 
 def process_verse_line(line: str, width: int, justify: bool) -> None:
+    """Processes a verse line, handling wrapping and justification."""
     verse_match = re.match(r'^(\d+)\s+(.*)$', line)
     if not verse_match:
-        print(' ' * 4 + line)
+        print(' ' * INDENT + line)
         return
 
     verse_num = verse_match.group(1)
@@ -103,36 +120,36 @@ def process_verse_line(line: str, width: int, justify: bool) -> None:
     verse_prefix = format_verse_prefix(verse_num)
     available_width = width - len(verse_prefix) - 1
 
-    current_line = []
-    current_len = 0
-    is_first_line = True
+    current_line_words = []
+    is_first_line_of_verse = True
 
     for word in words:
-        if current_len + len(word) + len(current_line) <= available_width:
-            current_line.append(word)
-            current_len += len(word)
+        current_len = sum(len(w) for w in current_line_words)
+        if current_len + len(word) + len(current_line_words) <= available_width:
+            current_line_words.append(word)
         else:
             if justify:
-                print_justified_line(current_line, available_width, verse_prefix, is_first_line)
+                print_justified_line(current_line_words, available_width, verse_prefix, is_first_line_of_verse)
             else:
-                line_text = ' '.join(current_line)
-                if is_first_line:
+                line_text = ' '.join(current_line_words)
+                if is_first_line_of_verse:
                     print(f"{verse_prefix} {line_text}")
                 else:
                     print(" " * (len(verse_prefix) + 1) + line_text)
 
-            current_line = [word]
-            current_len = len(word)
-            is_first_line = False
+            current_line_words = [word]
+            is_first_line_of_verse = False
 
-    if current_line:
-        line_text = ' '.join(current_line)
-        if is_first_line:
+    # Print the last remaining line of the verse, which is never justified.
+    if current_line_words:
+        line_text = ' '.join(current_line_words)
+        if is_first_line_of_verse:
             print(f"{verse_prefix} {line_text}")
         else:
             print(" " * (len(verse_prefix) + 1) + line_text)
 
 def format_text(file_input: TextIO, width: int = 60, justify: bool = True) -> None:
+    """Reads lines from a file and formats them."""
     lines = [line.rstrip() for line in file_input]
 
     for i, line in enumerate(lines):
@@ -147,19 +164,20 @@ def format_text(file_input: TextIO, width: int = 60, justify: bool = True) -> No
         if re.match(r'^\d+', line):
             process_verse_line(line, width, justify)
         else:
-            print(' ' * 4 + line)
+            print(' ' * INDENT + line)
 
 def main() -> None:
+    """Main function to parse arguments and format the file."""
     width, filename, justify = parse_arguments()
 
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             format_text(f, width, justify)
     except FileNotFoundError:
-        print(f"Error: File '{filename}' not found")
+        print(f"Error: File '{filename}' not found", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Error reading file: {e}")
+        print(f"Error reading file: {e}", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":
