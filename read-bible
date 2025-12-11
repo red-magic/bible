@@ -129,7 +129,7 @@ def main():
     width, filename, justify = parse_arguments()
 
     try:
-        with open(filename, encoding='utf-8') as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             format_file(f, width, justify)
     except FileNotFoundError:
         sys.exit(f"Error: File '{filename}' not found")
