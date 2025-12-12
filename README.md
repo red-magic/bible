@@ -15,7 +15,9 @@
 
 Read TXT files directly in terminal using the `read-bible` script:
 
-`./read-bible syn`
+```
+./read-bible syn
+```
 
 ![txt](images/txt.png)
 
