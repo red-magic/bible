@@ -115,7 +115,7 @@ def format_file(file, width, justify):
 
         if is_centered_line(lines, i):
             print_centered(line, width)
-        elif stripped[0].isdigit():  # verse line
+        elif stripped[0].isdigit():
             process_verse(line, width, justify)
         else:
             print(" " * INDENT + stripped)
