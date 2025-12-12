@@ -13,11 +13,9 @@
 
 ## TXT
 
-Read TXT files directly in terminal using the `read-bible` Python script:
+Read TXT files directly in terminal using the `read-bible` script:
 
-```
-./read-bible txt/syn.txt | less -M
-```
+`./read-bible syn`
 
 ![txt](images/txt.png)
 
