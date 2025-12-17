@@ -9,6 +9,5 @@ case $1 in
         ;;
     *)
         printf "Usage: %s <syn | kjv>\n" "$(basename "$0")"
-        exit 1
         ;;
 esac
