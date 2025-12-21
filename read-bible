@@ -4,7 +4,6 @@ set -e
 
 case $1 in
     syn | kjv)
-        cd "$(dirname "$0")"
         python3 formatter.py "txt/$1.txt" | less -M
         ;;
     *)
