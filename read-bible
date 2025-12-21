@@ -2,12 +2,20 @@
 
 set -e
 
+print_help() {
+    printf "usage: %s syn|kjv\n" "$(basename "$0")"
+}
+
 case $1 in
     syn | kjv)
         python3 formatter.py "txt/$1.txt" | less -M
         ;;
+    "")
+        print_help
+        ;;
     *)
-        printf "Usage: %s <syn | kjv>\n" "$(basename "$0")"
+        printf "%s: invalid bible: %s\n" "$(basename "$0")" "$1" >&2
+        print_help
         exit 1
         ;;
 esac
