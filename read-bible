@@ -9,15 +9,20 @@ print_help()
     printf "usage: %s syn|kjv\n" "$progname"
 }
 
-case $1 in
+if [ -z "$1" ]
+then
+    print_help
+    exit 0
+fi
+
+bible=$1
+
+case $bible in
     syn | kjv)
-        python3 formatter.py "txt/$1.txt" | less -M
-        ;;
-    "")
-        print_help
+        python3 formatter.py "txt/$bible.txt" | less -M
         ;;
     *)
-        printf "%s: invalid bible: %s\n" "$progname" "$1" >&2
+        printf "%s: invalid bible: %s\n" "$progname" "$bible" >&2
         print_help
         exit 1
         ;;
