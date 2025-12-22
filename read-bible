@@ -2,8 +2,11 @@
 
 set -e
 
-print_help() {
-    printf "usage: %s syn|kjv\n" "$(basename "$0")"
+progname=$(basename "$0")
+
+print_help()
+{
+    printf "usage: %s syn|kjv\n" "$progname"
 }
 
 case $1 in
@@ -14,7 +17,7 @@ case $1 in
         print_help
         ;;
     *)
-        printf "%s: invalid bible: %s\n" "$(basename "$0")" "$1" >&2
+        printf "%s: invalid bible: %s\n" "$progname" "$1" >&2
         print_help
         exit 1
         ;;
