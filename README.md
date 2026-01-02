@@ -13,7 +13,7 @@
 
 ## TXT
 
-Read TXT files directly in terminal using the `read-bible` script:
+Read TXT files directly in terminal using the `read-bible` script (requires Python):
 
 ```
 ./read-bible syn
