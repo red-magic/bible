@@ -6,7 +6,8 @@ progname=${0##*/}
 
 print_help()
 {
-    printf "usage: %s syn|kjv\n" "$progname"
+    printf "usage: %s syn\n" "$progname"
+    printf "       %s kjv\n" "$progname"
 }
 
 if [ $# -gt 1 ]
