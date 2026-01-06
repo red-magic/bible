@@ -11,7 +11,7 @@ print_help()
 
 if [ $# -gt 1 ]
 then
-    printf "%s: only 1 argument is accepted\n" "$progname" >&2
+    printf "%s: only 1 argument is accepted\n" "$progname" 1>&2
     print_help
     exit 1
 elif [ $# -eq 0 ]
@@ -27,7 +27,7 @@ case $bible in
         python3 formatter.py "txt/$bible.txt" | less -M
         ;;
     *)
-        printf "%s: invalid bible: %s\n" "$progname" "$bible" >&2
+        printf "%s: invalid bible: %s\n" "$progname" "$bible" 1>&2
         print_help
         exit 1
         ;;
