@@ -1,6 +1,6 @@
-import sys
-import signal
 import argparse
+import signal
+import sys
 
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
