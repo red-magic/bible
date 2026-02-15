@@ -16,7 +16,7 @@
 Read TXT files directly in terminal using the `read-bible` script (requires Python):
 
 ```
-./read-bible syn
+./read-bible kjv
 ```
 
 ![txt](images/txt.png)
