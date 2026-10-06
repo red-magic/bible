@@ -101,7 +101,6 @@ class BibleFormatter:
                 parts.append(" " * (base + (1 if i < extra else 0)))
         return "".join(parts)
 
-
 def parse_arguments() -> Tuple[int, str, bool]:
     parser = argparse.ArgumentParser(
         prog=os.path.basename(sys.argv[0]),
@@ -131,7 +130,6 @@ def parse_arguments() -> Tuple[int, str, bool]:
 
     args = parser.parse_args()
     return args.width, args.filename, not args.no_justify
-
 
 def main() -> None:
     width, filename, justify = parse_arguments()
