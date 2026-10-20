@@ -25,7 +25,7 @@ bible=$1
 
 case $bible in
     syn | kjv)
-        python3 formatter.py "txt/$bible.txt" | less -M
+        ./formatter.pl "txt/$bible.txt" | less -M
         ;;
     *)
         printf "%s: invalid bible: %s\n" "$progname" "$bible" 1>&2
