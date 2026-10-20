@@ -237,7 +237,7 @@ and optional full justification
 =head1 DESCRIPTION
 
 Reads a Bible text file and writes a reformatted version to standard
-output.  Blank lines are preserved, chapter headings (lines surrounded
+output. Blank lines are preserved, chapter headings (lines surrounded
 by blank lines) are centred, and verse lines (lines beginning with a
 digit) are re-indented, wrapped to the requested width, and optionally
 fully justified.
