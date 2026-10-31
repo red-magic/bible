@@ -4,7 +4,7 @@ set -e
 
 progname=${0##*/}
 
-print_help()
+usage()
 {
     printf "usage: %s syn\n" "$progname"
     printf "       %s kjv\n" "$progname"
@@ -13,11 +13,11 @@ print_help()
 if [ $# -gt 1 ]
 then
     printf "%s: only 1 argument is accepted\n" "$progname" 1>&2
-    print_help
+    usage
     exit 1
 elif [ $# -eq 0 ]
 then
-    print_help
+    usage
     exit 0
 fi
 
@@ -29,7 +29,7 @@ case $bible in
         ;;
     *)
         printf "%s: invalid bible: %s\n" "$progname" "$bible" 1>&2
-        print_help
+        usage
         exit 1
         ;;
 esac
