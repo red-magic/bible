@@ -11,6 +11,16 @@
     padding: 0;
 }
 
+@font-face {
+    font-family: STIX Two Text Regular;
+    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
+}
+
+@font-face {
+    font-family: STIX Two Text Italic;
+    src: url(fonts/STIXTwoText-Italic.woff2) format(woff2);
+}
+
 body {
     display: grid;
     grid-template-columns: 1fr minmax(min-content, 40rem) 1fr;
@@ -20,6 +30,26 @@ body {
     color: var(--color-text);
     font-family: STIX Two Text Regular;
     overflow-y: scroll;
+}
+
+h1, h2, h3 {
+    padding: 0.5rem 0;
+    text-align: center;
+    font-weight: normal;
+    font-size: 1rem;
+}
+
+h2 {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-image: url(images/grain.png);
+    background-color: var(--color-bg);
+    border-bottom: var(--border);
+}
+
+h3 {
+    padding: 1rem;
 }
 
 nav {
@@ -105,36 +135,6 @@ main img {
     margin: 0 auto;
     display: block;
     width: 4rem;
-}
-
-h1, h2, h3 {
-    padding: 0.5rem 0;
-    text-align: center;
-    font-weight: normal;
-    font-size: 1rem;
-}
-
-h2 {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-image: url(images/grain.png);
-    background-color: var(--color-bg);
-    border-bottom: var(--border);
-}
-
-h3 {
-    padding: 1rem;
-}
-
-@font-face {
-    font-family: STIX Two Text Regular;
-    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
-}
-
-@font-face {
-    font-family: STIX Two Text Italic;
-    src: url(fonts/STIXTwoText-Italic.woff2) format(woff2);
 }
 
 @media only screen and (max-width: 800px) {

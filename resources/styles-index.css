@@ -12,6 +12,11 @@
     padding: 0;
 }
 
+@font-face {
+    font-family: STIX Two Text Regular;
+    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
+}
+
 body {
     display: flex;
     place-items: center;
@@ -57,9 +62,4 @@ td a:hover {
 
 tr:last-child td {
     border-bottom: none;
-}
-
-@font-face {
-    font-family: STIX Two Text Regular;
-    src: url(fonts/STIXTwoText-Regular.woff2) format(woff2);
 }
