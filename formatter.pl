@@ -89,9 +89,7 @@ sub justify_words {
 
 sub render_line {
     my ($words, $width, $last, $justify) = @_;
-    if ($justify && !$last && @$words > 1) {
-        return justify_words($words, $width);
-    }
+    return justify_words($words, $width) if $justify && !$last;
     return join(' ', @$words);
 }
 
