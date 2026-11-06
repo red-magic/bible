@@ -9,23 +9,22 @@ use Getopt::Long    qw(GetOptions);
 use PerlIO::encoding;
 use Pod::Usage      qw(pod2usage);
 
-$PerlIO::encoding::fallback = FB_CROAK;
+use constant INDENT             => 4;
+use constant VERSE_PREFIX_WIDTH => 3;
 
+$PerlIO::encoding::fallback = FB_CROAK;
 $SIG{PIPE} = 'DEFAULT';
 
 binmode(STDOUT, ':encoding(UTF-8)');
 binmode(STDERR, ':encoding(UTF-8)');
 
-{ my $p = $0; $0 = $p if utf8::decode($p); }
-
-use constant INDENT             => 4;
-use constant VERSE_PREFIX_WIDTH => 3;
+{ my $program = $0; $0 = $program if utf8::decode($program); }
 
 sub maybe_decode {
-    my ($s) = @_;
-    my $copy = $s;
+    my ($string) = @_;
+    my $copy = $string;
     return $copy if utf8::decode($copy);
-    return $s;
+    return $string;
 }
 
 sub is_blank {
@@ -34,8 +33,8 @@ sub is_blank {
 }
 
 sub strip {
-    my ($s) = @_;
-    return $s =~ s/^\s+|\s+\z//gr;
+    my ($string) = @_;
+    return $string =~ s/^\s+|\s+\z//gr;
 }
 
 sub classify {
@@ -50,17 +49,17 @@ sub wrap_words {
     my ($words, $width) = @_;
     my @lines;
     my @current;
-    my $len = 0;
+    my $length = 0;
 
     for my $word (@$words) {
         my $needed = length($word) + (@current ? 1 : 0);
-        if ($len + $needed <= $width) {
+        if ($length + $needed <= $width) {
             push @current, $word;
-            $len += $needed;
+            $length += $needed;
         } else {
             push @lines, [@current] if @current;
             @current = ($word);
-            $len     = length($word);
+            $length  = length($word);
         }
     }
     push @lines, [@current] if @current;
@@ -79,12 +78,12 @@ sub justify_words {
     my $base  = int($space / $gaps);
     my $extra = $space % $gaps;
 
-    my $out = '';
+    my $line = '';
     for my $i (0 .. $#$words) {
-        $out .= $words->[$i];
-        $out .= ' ' x ($base + ($i < $extra ? 1 : 0)) if $i < $gaps;
+        $line .= $words->[$i];
+        $line .= ' ' x ($base + ($i < $extra ? 1 : 0)) if $i < $gaps;
     }
-    return $out;
+    return $line;
 }
 
 sub render_line {
@@ -104,11 +103,11 @@ sub emit_centered {
 
 sub emit_verse {
     my ($line, $width, $justify) = @_;
-    my ($num, $text) = split(' ', $line, 2);
-    my $prefix = sprintf('%*s', VERSE_PREFIX_WIDTH, $num);
+    my ($number, $text) = split(' ', $line, 2);
+    my $prefix = sprintf('%*s', VERSE_PREFIX_WIDTH, $number);
     my $avail  = $width - length($prefix) - 1;
     $avail = 1 if $avail < 1;
-    my $cont = ' ' x (length($prefix) + 1);
+    my $continuation = ' ' x (length($prefix) + 1);
 
     if (!defined $text || !length $text) {
         say $prefix;
@@ -118,7 +117,7 @@ sub emit_verse {
     my $wrapped = wrap_words([split(' ', $text)], $avail);
     my $last    = $#$wrapped;
     for my $i (0 .. $last) {
-        my $lead = $i == 0 ? "$prefix " : $cont;
+        my $lead = $i == 0 ? "$prefix " : $continuation;
         say $lead, render_line($wrapped->[$i], $avail, $i == $last, $justify);
     }
 }
@@ -140,8 +139,12 @@ sub format_file {
     my ($fh, $width, $justify) = @_;
 
     local $/ = undef;
+    $! = 0;
     my $content = <$fh>;
-    $content = '' unless defined $content;
+    if (!defined $content) {
+        die "read error: $!" if $!;
+        $content = '';
+    }
 
     $content =~ s/\r\n?/\n/g;
 
@@ -168,11 +171,11 @@ sub parse_arguments {
         'w|width=i'    => \$width,
         'n|no-justify' => \$no_justify,
         'h|help'       => \$help,
-        ) or pod2usage(-exitval => 2, -verbose => 0);
+        ) or pod2usage(-exitval => 2, -verbose => 0, -output => \*STDERR);
 
-    pod2usage(-exitval => 0, -verbose => 2) if $help;
+    pod2usage(-exitval => 0, -verbose => 2, -output => \*STDOUT) if $help;
 
-    pod2usage(-exitval => 0, -verbose => 2, -output => \*STDERR)
+    pod2usage(-exitval => 2, -verbose => 0, -output => \*STDERR)
         unless @ARGV;
 
     if ($width < 1) {
@@ -193,9 +196,10 @@ sub main {
 
     open(my $fh, '<:encoding(UTF-8)', $filename) or do {
         my $err = $!;
-        say STDERR $err == ENOENT
+        my $message = $err == ENOENT
             ? "Error: File '$filename' not found"
             : "Error: $err";
+        say STDERR $message;
         exit 1;
     };
 
@@ -221,16 +225,16 @@ __END__
 
 =head1 NAME
 
-bible_formatter.pl - format Bible text files with proper indentation
-and optional full justification
+formatter.pl - format Bible text files with proper indentation and
+optional full justification
 
 =head1 SYNOPSIS
 
- bible_formatter.pl [options] I<filename>
+ formatter.pl [options] <filename>
 
- bible_formatter.pl -w 80 txt/kjv.txt
- bible_formatter.pl -w 70 -n txt/syn.txt
- bible_formatter.pl --no-justify txt/syn.txt
+ formatter.pl -w 80 txt/kjv.txt
+ formatter.pl -w 70 -n txt/syn.txt
+ formatter.pl --no-justify txt/syn.txt
 
 =head1 DESCRIPTION
 
@@ -249,7 +253,7 @@ silently substituted, so the output is always valid UTF-8.
 
 =item B<-w> I<n>, B<--width> I<n>
 
-Output line width in columns.  Defaults to 60.
+Output line width in columns. Defaults to 60.
 
 =item B<-n>, B<--no-justify>
 
